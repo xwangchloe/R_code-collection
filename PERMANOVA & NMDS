@@ -1,0 +1,30 @@
+** PERMANOVA Analysis
+install.packages("vegan")
+library(vegan)
+Perm<- read.csv("~\\sample.csv", header=TRUE, sep=",",row.names=1)
+GPerm<- read.csv("~\\sample_group.csv", header=TRUE, sep=",",row.names=1)
+str(Perm)
+str(GPperm)
+###-----Distance Matrix----
+### Compute distance matrix using Bray-Curtis on double-root transformed abundances
+### This file can be got from your program, or you can calculate again (Optional)
+range(Perm^0.25) #Double root transformation
+dist_Perm<-vegdist(Perm^0.25,method="bray")
+
+###----------PERMANOVA-------------
+pmv<-adonis(Perm^0.25~Group,data=GPer,permutations=999,method="bray")
+pmv
+
+**NMDS Analysis
+###------NMDS----------
+### Run NMDS 
+nmds<-metaMDS(dist_Perm)
+plot(nmds)   #you will get a scatter
+plot(nmds,type="text")    #you will get a scatter only with names
+### Plot NMDS
+op<-ordiplot(nmds,type="n") #get an empty plot
+cols=c("darkred","green") #we can use a lot of colours based on your groups
+points(nmds,cex=2,pch=16,col=cols[GPer$groups]) 
+ordisper(nmds,groups=GPer$groups,label=TRUE) 
+ordihull(nmds,groups=GPer$groups,lty="dotted")  
+legend("bottomleft",pch=16,col=cols,legend=levels(GPer$groups)) #Position, color, legend and other settings, always use help in R.
