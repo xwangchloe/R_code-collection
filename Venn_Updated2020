@@ -1,0 +1,16 @@
+## Due to the Bioconductor update, the code for Venn Diagram is changed here. ###
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+
+BiocManager::install("limma")
+library(limma)
+
+Com<- read.csv("F:/usRDT Kenya 2019/Community.csv", header=TRUE, sep=",") #load data
+Com
+attach(Com)
+c1<-cbind(Micro,us, LDH, SD)
+c1
+c<-vennCounts(c1)
+c
+vennDiagram(c)#get venn diagram
