@@ -1,0 +1,52 @@
+#To make a figure with shaded CI
+##packages used
+library(stats)
+library(geepack)
+library(dplyr)
+library("tidyverse")
+library(ggplot2)
+library(Hmisc)
+#~~~base figure for AeBG1
+plotAeBG10<-ggplot(data=AeBG1, aes(Week, Abundance))+
+  scale_color_brewer(palette = "Set1")+
+  theme_classic()+
+  theme(axis.line = element_line(colour = "black", 
+                                 size = 0.5, linetype = "solid"))+
+  scale_x_continuous(limits=c(23, 37),breaks=seq(23, 37, 1)) +
+  scale_y_continuous(limits=c(0, 25),breaks =seq(0, 25, 5))
+plotAeBG10
+#Figure with no shade for AeBG1
+plotAeBG10+
+  stat_summary(fun.y = mean,geom = "line",size = 1,aes(colour = Treat.Control))+
+  labs(x = "Time (week)",y = expression(paste("Ae. aegypti Abundance (per trap-night)")),colour = "")
+##Final figure with shade
+plotAeBG1<-
+  plotAeBG10+
+  stat_summary(fun.y = mean,geom = "line",size = 1,aes(colour = Treat.Control))+
+  labs(x = "Time (week)",y = expression(paste("Ae. aegypti Abundance (per trap-night)")),colour = "")+
+  stat_summary(fun.data = mean_cl_boot,geom = "ribbon",size = 2,aes(fill = Treat.Control),alpha = 0.3)+
+  guides(fill = "none")
+plotAeBG1
+##Note: if there are outliers, be careful
+AB1<-AeBG1 %>% 
+group_by(Treat.Control, Week) %>% 
+  summarise(TrapNight=n(),
+            mean.abundance=mean(Abundance),
+            se=sd(Abundance)/sqrt(TrapNight),
+            uci = mean.abundance+(qt(p=0.05/2, df=TrapNight-1,lower.tail=F))*se,
+            lci = mean.abundance-(qt(p=0.05/2, df=TrapNight-1,lower.tail=F))*se)
+AB1 #Results for table 
+write.table(AB1, file="AeBG1Summary.txt", append = FALSE, sep = " ", dec = ".",
+            row.names = TRUE, col.names = TRUE) ##Needed if you want to save this file## Comparison between treatment and control
+summary(AB1)
+ggplot(data=AB1, aes(x=Week, y=mean.abundance))+
+  geom_line(size = 1.5,aes(colour = Treat.Control))+
+  geom_ribbon(aes(ymin=lci, ymax=uci,fill=Treat.Control), alpha=0.3)+
+  labs(x = "Time (week)",y = expression(paste("Ae. aegypti Abundance (per trap-night)")),colour = "")+
+  guides(fill = "none")+
+  scale_color_brewer(palette = "Set1")+
+  theme_classic()+
+  theme(axis.line = element_line(colour = "black", 
+                                 size = 0.5, linetype = "solid"))+
+  scale_x_continuous(limits=c(23, 37),breaks=seq(23, 37, 1)) +
+  scale_y_continuous(limits=c(-1, 15),breaks =seq(0, 15, 3))
