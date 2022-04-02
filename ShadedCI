@@ -50,3 +50,13 @@ ggplot(data=AB1, aes(x=Week, y=mean.abundance))+
                                  size = 0.5, linetype = "solid"))+
   scale_x_continuous(limits=c(23, 37),breaks=seq(23, 37, 1)) +
   scale_y_continuous(limits=c(-1, 15),breaks =seq(0, 15, 3))
+
+
+change the titale, legend fonts
+theme (
+axis.title.x=element_text(size=14, face="bold"),
+axis.title.y=element_text(size=14, face="bold"),
+legend.title=element_text(size=14, face="bold"))
+
+theme (
+text=element_text(size=15)
